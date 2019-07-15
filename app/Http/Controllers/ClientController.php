@@ -10,44 +10,31 @@ use App\Client;
 
 class ClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public $validations = ['name'=>'required',
+    'email'=>'required|email',
+    'company'=>'required',
+    'city'=>'required',
+    'country'=>'required'];
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $clients = Client::all();
         return view('clients.index')->with('clients',$clients);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
        
         return view('clients.create');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $validations = ['name'=>'required',
-                        'email'=>'required|email',
-                        'company'=>'required',
-                        'city'=>'required',
-                        'country'=>'required',
-                        'image'=>'required'];
-        $this->validate($request, $validations);
-        // client::create($request->all());
+        $this->validate($request, $this->validations);
+
         $client = new client();
         $client->name = $request->input('name');
         $client->email = $request->input('email');
@@ -61,83 +48,59 @@ class ClientController extends Controller
             $file->move(public_path().'/postpic/',
             $file->getClientOriginalName());
             $url = URL::to('/').'/postpic/'.$file->getClientOriginalName();
-            // return $url;exit;
             $client->image = $url;
+        }
+        
+    $client->save();
 
-
-        $client->save();}
-        return redirect()->route('client.index')->with('success','Client has been saved');
+    return redirect()->route('client.index')->with('success','Client has been saved');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show($id)
     {
          $client = Client::find($id);
          return view('clients.show')->with('client',$client);
 
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $client = Client::find($id);
         return view('clients.edit')->with('client',$client);
 
     }
-
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     *  Updating User Client Info
      */
+
     public function update(Request $request, $id)
     {
-        $this->validate($request, ['name'=>'required',
-        'email'=>'required|email',
-        'company'=>'required',
-        'city'=>'required',
-        'country'=>'required',
-        'image'=>'required']);
+        $this->validate($request, $this->validations);
+         $name = $request->get("name");
+         $email = $request->get("email");
+         $company =  $request->get("company");
+         $city =  $request->get("city");
+         $country=  $request->get("country");
+         $image =  $request->get("image");
 
-        $client = new client();
-        $client->name = $request->input('name');
-        $client->email = $request->input('email');
-        $client->company = $request->input('company');
-        $client->city = $request->input('city');
-        $client->country = $request->input('country');
+        $data = compact("name", "email","company", "city", "country", "image");
+
+        $client = Client::find($id);
 
         if(input::hasFile('image')){
             $file = input::file('image');
             $file->move(public_path().'/postpic/',
             $file->getClientOriginalName());
             $url = URL::to('/').'/postpic/'.$file->getClientOriginalName();
-            // return $url;exit;
-            $client->image = $url;
+            $data["image"] = $url;    
+        }
 
-        $data = ['name' => $client->name,'email' => $client->email,'company' => $client->company,
-        'city' => $client->city,'country' => $client->country,'image' => $client->image];
-        Client::where('id',$id)->update($data);}
+
+        $client->update($data);
+
         return redirect()->route('client.index')->with('success','Client has been updated');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         Client::where('id',$id)->delete();
