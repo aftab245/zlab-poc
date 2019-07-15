@@ -105,7 +105,7 @@
                             <div class="col-md-6 col-md-offset-4">
                                 {{ method_field('PUT') }}
                                 <button type="submit" class="btn btn-primary btn-block">
-                                    Save
+                                    Update
                                 </button>
                             </div>
                         </div>

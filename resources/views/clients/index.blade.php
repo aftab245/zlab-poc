@@ -4,12 +4,12 @@
 
 
 <div class="container-info">
-
+    @if(session('success'))
+    <div class="alert alert-success">{{session('success')}}</div>
+    @endif
     <div class="page-info">
         <div class="title">
-            @if(session('success'))
-            <div class="alert alert-success">{{session('success')}}</div>
-            @endif
+
             <h1> Client Information!</h1>
         </div>
         <div class="add-btn">
@@ -20,48 +20,59 @@
 
     </div>
 
-    @if(count($clients)>0)
-    @foreach($clients as $key=>$client)
-    <div class="well">
-        <table class="table table-border">
-            <thead align="center">
-                <th>S-No</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>City</th>
-                <th>Country</th>
-                <th>image</th>
-                <th>Action</th>
 
-            </thead align="center">
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <tr class="text-center">
+                    <th>S-No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
             <tbody>
-                <td> {{ ++$key }}</td>
-                <td> {{ $client->name }}</td>
-                <td> {{ $client->email }}</td>
-                <td> {{ $client->city }}</td>
-                <td> {{ $client->country }}</td>
-                <td> <img src="{{ $client->image }}" style="height:70px;width:70px"></td>
-                <td>{{ csrf_field() }}
-                    <a href='{{ URL("client/{$client->id}") }}'><span class="fas fa-eye"></span></a>&nbsp;&nbsp;
-                    <a href='{{ route("client.edit", $client->id) }}'><span class="fas fa-edit"></span></a>&nbsp;&nbsp;
-                    <a href='{{ route("client.destroy", $client->id) }}'><span
-                            class="fas fa-trash"></span></a>&nbsp;&nbsp;
-                    <!-- <a href='#' data-action='{{ route("client.destroy", $client->id) }}' id="delete-client"
+                @if(count($clients)>0)
+                @foreach($clients as $key=>$client)
+                <tr align="center">
+                    <td> {{ ++$key }}</td>
+                    <td> {{ $client->name }}</td>
+                    <td> {{ $client->email }}</td>
+                    <td> {{ $client->city }}</td>
+                    <td> {{ $client->country }}</td>
+                    <td> <img src="{{ $client->image }}" style="height:70px;width:70px"></td>
+                    <td>{{ csrf_field() }}
+                        <a href='{{ URL("client/{$client->id}") }}' class="btn btn-info"><span
+                                class="fas fa-eye"></span></a>&nbsp;&nbsp;
+                        <a href='{{ route("client.edit", $client->id) }}' class="btn btn-primary"><span
+                                class="fas fa-edit"></span></a>&nbsp;&nbsp;
+                        <form action="{{ action('ClientController@destroy',$client->id) }}" method="POST"
+                            style="display:inline">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger"><span class="fas fa-trash"></span></button>
+                        </form>
+                        <!-- <a href='{{ route("client.destroy", $client->id) }}' class="btn btn-danger">
+                            <span class="fas fa-trash"></span></a>&nbsp;&nbsp; -->
+                        <!-- <a href='#' data-action='{{ route("client.destroy", $client->id) }}' id="delete-client"
                         rel="{{$client->id}}"><span class="fas fa-trash"></span></a>&nbsp;&nbsp; -->
 
-                </td>
+                    </td>
+                </tr>
+                @endforeach
             </tbody>
 
         </table>
 
     </div>
-    @endforeach
     @else
     <p> No information found</p>
     @endif
 </div>
 @endsection
-
 <style>
 .page-info {
     display: flex;
@@ -76,27 +87,3 @@
     text-transform: uppercase;
 }
 </style>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script>
-$(document).ready(function() {
-    $(document).on("click", "#delete-client", function(event) {
-        let clientId = $(this).attr("rel");
-        let action = $(this).data("action");
-        let _token = $("input[name=_token]").val();
-        console.log("I am clicked", action)
-
-        $.ajax({
-            url: action,
-            method: 'delete',
-            data: {
-                _token
-            },
-            cache: false,
-            success: function(response) {
-                alert("Successfully deleted")
-            }
-        });
-    })
-})
-</script>

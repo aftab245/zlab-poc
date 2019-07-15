@@ -1,14 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<h1> Client Information!</h1>
 
 @if(count($client)>0)
 
-<div class="well">
-    <table class="table">
+<div class="well" style="width:70%;margin:auto">
+    <h1> Client Biodata!</h1>
+    <table class="table table-bordered">
 
-
+        <tr>
+            <th rowspan="7"><img src="{{ $client->image }}" style="height:300px;width:400px"></th>
+        </tr>
 
         <tr>
             <th>Name</th>
@@ -30,11 +32,6 @@
             <th>Country</th>
             <td> {{ $client->country }}</td>
         </tr>
-        <tr>
-            <th>Image</th>
-            <td> <img src="{{ $client->image }}" style="height:70px;width:70px"></td>
-        </tr>
-
     </table>
 </div>
 
